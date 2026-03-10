@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduPulse — Student Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root[data-theme="dark"] {
+    --bg: #0d0f14;
+    --bg2: #13161e;
+    --bg3: #1a1e2a;
+    --card: #1e2230;
+    --card2: #242838;
+    --border: rgba(255,255,255,0.07);
+    --text: #e8eaf2;
+    --text2: #8890a8;
+    --text3: #5a6078;
+    --accent: #6c63ff;
+    --accent2: #ff6b6b;
+    --accent3: #43e97b;
+    --accent4: #f7c948;
+    --glow: rgba(108,99,255,0.15);
+    --sidebar-w: 240px;
+  }
+  :root[data-theme="light"] {
+    --bg: #f0f2f8;
+    --bg2: #e8eaf4;
+    --bg3: #dde0ee;
+    --card: #ffffff;
+    --card2: #f5f6fc;
+    --border: rgba(0,0,0,0.08);
+    --text: #1a1e2a;
+    --text2: #5a6078;
+    --text3: #8890a8;
+    --accent: #6c63ff;
+    --accent2: #ff6b6b;
+    --accent3: #22c55e;
+    --accent4: #f59e0b;
+    --glow: rgba(108,99,255,0.1);
+    --sidebar-w: 240px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    transition: background 0.4s, color 0.4s;
+    overflow-x: hidden;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 0;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+    transition: transform 0.35s cubic-bezier(.4,0,.2,1), background 0.4s;
+  }
+  .sidebar-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    padding: 0 24px 32px;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sidebar-logo span.dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 3px;
+    box-shadow: 0 0 12px var(--accent);
+  }
+  .nav-section {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 0 24px 10px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 24px;
+    cursor: pointer;
+    border-radius: 0;
+    color: var(--text2);
+    font-size: 0.9rem;
+    font-weight: 400;
+    transition: all 0.2s;
+    position: relative;
+    text-decoration: none;
+  }
+  .nav-item:hover { color: var(--text); background: var(--glow); }
+  .nav-item.active {
+    color: var(--accent);
+    background: var(--glow);
+    font-weight: 500;
+  }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 20%; bottom: 20%;
+    width: 3px;
+    background: var(--accent);
+    border-radius: 0 4px 4px 0;
+  }
+  .nav-icon { font-size: 1.1rem; width: 22px; text-align: center; }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--accent2);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+  }
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.82rem;
+    color: var(--text2);
+    cursor: pointer;
+    padding: 8px 0;
+  }
+  .toggle-track {
+    width: 40px; height: 22px;
+    background: var(--bg3);
+    border-radius: 100px;
+    position: relative;
+    transition: background 0.3s;
+    border: 1px solid var(--border);
+  }
+  .toggle-thumb {
+    width: 16px; height: 16px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: absolute;
+    top: 2px; left: 2px;
+    transition: left 0.3s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 0 8px var(--accent);
+  }
+  [data-theme="light"] .toggle-thumb { left: 20px; }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    transition: background 0.4s;
+  }
+  .menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 1.4rem;
+    cursor: pointer;
+  }
+  .topbar-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+  .topbar-search {
+    flex: 1;
+    max-width: 340px;
+    margin-left: auto;
+    position: relative;
+  }
+  .topbar-search input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 16px 9px 38px;
+    color: var(--text);
+    font-size: 0.85rem;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s, background 0.4s;
+  }
+  .topbar-search input:focus { border-color: var(--accent); }
+  .topbar-search::before {
+    content: '🔍';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8rem;
+    opacity: 0.5;
+  }
+  .notif-btn {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .notif-btn:hover { border-color: var(--accent); }
+  .notif-dot {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 8px; height: 8px;
+    background: var(--accent2);
+    border-radius: 50%;
+    border: 2px solid var(--bg2);
+  }
+  .avatar-sm {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  /* ── CONTENT ── */
+  .content {
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    flex: 1;
+  }
+
+  .welcome-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .welcome-text h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .welcome-text h1 em {
+    font-style: normal;
+    background: linear-gradient(90deg, var(--accent), #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .welcome-text p {
+    color: var(--text2);
+    font-size: 0.9rem;
+    margin-top: 6px;
+  }
+  .date-chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-size: 0.82rem;
+    color: var(--text2);
+    text-align: right;
+  }
+  .date-chip strong { display: block; color: var(--text); font-weight: 600; }
+
+  /* ── PROFILE + STATS ROW ── */
+  .top-row {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 20px;
+  }
+
+  /* Profile Card */
+  .profile-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.5s ease both;
+  }
+  .profile-card::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: -40px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+    opacity: 0.18;
+    pointer-events: none;
+  }
+  .avatar-wrap {
+    width: 88px; height: 88px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), #a78bfa, #f472b6);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+    box-shadow: 0 0 0 4px var(--bg2), 0 0 0 6px var(--accent);
+    position: relative;
+    transition: transform 0.3s;
+    cursor: pointer;
+  }
+  .avatar-wrap:hover { transform: scale(1.05); }
+  .online-badge {
+    position: absolute;
+    bottom: 4px; right: 4px;
+    width: 16px; height: 16px;
+    background: var(--accent3);
+    border-radius: 50%;
+    border: 3px solid var(--card);
+  }
+  .profile-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-align: center;
+  }
+  .profile-dept {
+    font-size: 0.8rem;
+    color: var(--accent);
+    background: var(--glow);
+    padding: 3px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(108,99,255,0.25);
+  }
+  .profile-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tag {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 0.75rem;
+    color: var(--text2);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .tag span { font-size: 0.85rem; }
+  .profile-divider { width: 100%; height: 1px; background: var(--border); }
+  .profile-stats {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    justify-content: center;
+  }
+  .pstat { text-align: center; }
+  .pstat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+  .pstat-lbl { font-size: 0.72rem; color: var(--text3); margin-top: 2px; }
+
+  /* Stat Cards */
+  .stat-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: transform 0.25s, box-shadow 0.25s;
+    animation: fadeUp 0.5s ease both;
+  }
+  .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px var(--glow);
+  }
+  .stat-card:nth-child(1) { animation-delay: 0.05s; }
+  .stat-card:nth-child(2) { animation-delay: 0.1s; }
+  .stat-card:nth-child(3) { animation-delay: 0.15s; }
+  .stat-card:nth-child(4) { animation-delay: 0.2s; }
+  .stat-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .stat-icon {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+  }
+  .stat-trend {
+    font-size: 0.72rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .trend-up { background: rgba(67,233,123,0.12); color: var(--accent3); }
+  .trend-down { background: rgba(255,107,107,0.12); color: var(--accent2); }
+  .stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .stat-lbl { font-size: 0.8rem; color: var(--text2); }
+  .progress-bar-wrap {
+    background: var(--bg3);
+    border-radius: 100px;
+    height: 5px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 1.2s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ── CHARTS ROW ── */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    animation: fadeUp 0.5s ease both;
+  }
+  .chart-card:nth-child(1) { animation-delay: 0.25s; }
+  .chart-card:nth-child(2) { animation-delay: 0.3s; }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+  .card-pill {
+    font-size: 0.72rem;
+    padding: 4px 10px;
+    background: var(--bg3);
+    border-radius: 20px;
+    color: var(--text2);
+    border: 1px solid var(--border);
+  }
+  canvas { display: block; width: 100% !important; }
+
+  /* ── LOWER ROW ── */
+  .lower-row {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+  }
+
+  /* Announcements */
+  .announce-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    animation: fadeUp 0.5s ease 0.35s both;
+  }
+  .announce-list { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+  .announce-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px;
+    background: var(--card2);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: pointer;
+  }
+  .announce-item:hover { border-color: var(--accent); transform: translateX(3px); }
+  .announce-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .announce-body h4 { font-size: 0.87rem; font-weight: 600; margin-bottom: 3px; }
+  .announce-body p { font-size: 0.78rem; color: var(--text2); line-height: 1.4; }
+  .announce-body time { font-size: 0.72rem; color: var(--text3); margin-top: 4px; display: block; }
+
+  /* Task Manager */
+  .task-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    animation: fadeUp 0.5s ease 0.4s both;
+  }
+  .task-add-row {
+    display: flex;
+    gap: 8px;
+  }
+  .task-input {
+    flex: 1;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 14px;
+    color: var(--text);
+    font-size: 0.83rem;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s, background 0.4s;
+  }
+  .task-input:focus { border-color: var(--accent); }
+  .task-input::placeholder { color: var(--text3); }
+  .add-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: 10px;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 700;
+    transition: transform 0.15s, box-shadow 0.15s;
+    flex-shrink: 0;
+  }
+  .add-btn:hover { transform: scale(1.1); box-shadow: 0 4px 16px rgba(108,99,255,0.5); }
+  .task-list { display: flex; flex-direction: column; gap: 8px; }
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--card2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    transition: opacity 0.3s, background 0.2s;
+    animation: slideIn 0.25s ease;
+  }
+  .task-item.done { opacity: 0.5; }
+  .task-item.done .task-text { text-decoration: line-through; color: var(--text3); }
+  .task-check {
+    width: 20px; height: 20px;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+    transition: background 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+    background: transparent;
+    color: transparent;
+  }
+  .task-item.done .task-check {
+    background: var(--accent3);
+    border-color: var(--accent3);
+    color: #fff;
+  }
+  .task-text { flex: 1; font-size: 0.83rem; }
+  .task-tag {
+    font-size: 0.68rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .tag-urgent { background: rgba(255,107,107,0.15); color: var(--accent2); }
+  .tag-soon { background: rgba(247,201,72,0.15); color: var(--accent4); }
+  .tag-done { background: rgba(67,233,123,0.12); color: var(--accent3); }
+  .task-del {
+    background: none;
+    border: none;
+    color: var(--text3);
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
+  }
+  .task-del:hover { color: var(--accent2); background: rgba(255,107,107,0.1); }
+  .task-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.76rem;
+    color: var(--text3);
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+  }
+  .task-clear {
+    color: var(--accent2);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 0.76rem;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+  }
+  .task-clear:hover { text-decoration: underline; }
+
+  /* Overlay */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 90;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1100px) {
+    .top-row { grid-template-columns: 1fr; }
+    .stat-cards { grid-template-columns: repeat(4, 1fr); }
+    .profile-card { flex-direction: row; flex-wrap: wrap; text-align: left; padding: 20px; }
+    .avatar-wrap { width: 64px; height: 64px; font-size: 1.4rem; }
+    .profile-name { font-size: 1rem; }
+  }
+  @media (max-width: 900px) {
+    .charts-row { grid-template-columns: 1fr; }
+    .lower-row { grid-template-columns: 1fr; }
+    .stat-cards { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 700px) {
+    :root { --sidebar-w: 240px; }
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-overlay.open { display: block; }
+    .main { margin-left: 0; }
+    .menu-btn { display: flex; }
+    .content { padding: 20px 16px; }
+    .topbar { padding: 14px 16px; }
+    .stat-cards { grid-template-columns: repeat(2, 1fr); }
+    .welcome-text h1 { font-size: 1.4rem; }
+  }
+  @media (max-width: 420px) {
+    .stat-cards { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Sidebar Overlay -->
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <span class="dot"></span> EduPulse
+  </div>
+
+  <div class="nav-section">Main</div>
+  <a class="nav-item active" onclick="setActive(this)">
+    <span class="nav-icon">🏠</span> Dashboard
+  </a>
+  <a class="nav-item" onclick="setActive(this)">
+    <span class="nav-icon">📚</span> Courses
+  </a>
+  <a class="nav-item" onclick="setActive(this)">
+    <span class="nav-icon">📝</span> Assignments
+    <span class="nav-badge">3</span>
+  </a>
+
+  <div class="nav-section" style="margin-top:14px">Academic</div>
+  <a class="nav-item" onclick="setActive(this)">
+    <span class="nav-icon">📅</span> Attendance
+  </a>
+  <a class="nav-item" onclick="setActive(this)">
+    <span class="nav-icon">💬</span> Messages
+    <span class="nav-badge">5</span>
+  </a>
+  <a class="nav-item" onclick="setActive(this)">
+    <span class="nav-icon">📊</span> Grades
+  </a>
+  <a class="nav-item" onclick="setActive(this)">
+    <span class="nav-icon">⚙️</span> Settings
+  </a>
+
+  <div class="sidebar-bottom">
+    <div class="theme-toggle" onclick="toggleTheme()">
+      <div class="toggle-track"><div class="toggle-thumb"></div></div>
+      <span id="theme-label">Light Mode</span>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="menu-btn" onclick="openSidebar()">☰</button>
+    <div class="topbar-title">Dashboard</div>
+    <div class="topbar-search">
+      <input type="text" placeholder="Search courses, assignments…">
+    </div>
+    <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+    <div class="avatar-sm">AP</div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- Welcome Row -->
+    <div class="welcome-row">
+      <div class="welcome-text">
+        <h1>Good morning, <em>Aryan</em> 👋</h1>
+        <p>You have 3 pending assignments and 2 upcoming exams this week.</p>
+      </div>
+      <div class="date-chip">
+        <strong id="cur-date">Tuesday, March 10</strong>
+        <span>Semester 4 · Spring 2026</span>
+      </div>
+    </div>
+
+    <!-- Profile + Stats -->
+    <div class="top-row">
+      <!-- Profile Card -->
+      <div class="profile-card">
+        <div class="avatar-wrap">
+          AP
+          <div class="online-badge"></div>
+        </div>
+        <div class="profile-name">Aryan Patel</div>
+        <div class="profile-dept">B.Tech — Computer Science</div>
+        <div class="profile-tags">
+          <div class="tag"><span>🎓</span> Semester 4</div>
+          <div class="tag"><span>🏫</span> IITM · Lucknow</div>
+          <div class="tag"><span>🆔</span> CS-2022-047</div>
+        </div>
+        <div class="profile-divider"></div>
+        <div class="profile-stats">
+          <div class="pstat">
+            <div class="pstat-val" style="color:var(--accent)">8.4</div>
+            <div class="pstat-lbl">Current GPA</div>
+          </div>
+          <div class="pstat">
+            <div class="pstat-val" style="color:var(--accent3)">85%</div>
+            <div class="pstat-lbl">Attendance</div>
+          </div>
+          <div class="pstat">
+            <div class="pstat-val" style="color:var(--accent4)">12</div>
+            <div class="pstat-lbl">Completed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div class="stat-icon" style="background:rgba(108,99,255,0.12); color:var(--accent)">📅</div>
+            <span class="stat-trend trend-up">↑ +2%</span>
+          </div>
+          <div class="stat-val" style="color:var(--accent)">85<span style="font-size:1rem; font-weight:400; color:var(--text2)">%</span></div>
+          <div class="stat-lbl">Attendance Rate</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" style="width:85%; background:linear-gradient(90deg,var(--accent),#a78bfa)"></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div class="stat-icon" style="background:rgba(247,201,72,0.12); color:var(--accent4)">⭐</div>
+            <span class="stat-trend trend-up">↑ 0.3</span>
+          </div>
+          <div class="stat-val" style="color:var(--accent4)">8.4<span style="font-size:1rem; font-weight:400; color:var(--text2)">/10</span></div>
+          <div class="stat-lbl">Current GPA</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" style="width:84%; background:linear-gradient(90deg,var(--accent4),#fb923c)"></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div class="stat-icon" style="background:rgba(67,233,123,0.12); color:var(--accent3)">✅</div>
+            <span class="stat-trend trend-up">12 done</span>
+          </div>
+          <div class="stat-val" style="color:var(--accent3)">12<span style="font-size:1rem; font-weight:400; color:var(--text2)">/15</span></div>
+          <div class="stat-lbl">Assignments Done</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" style="width:80%; background:linear-gradient(90deg,var(--accent3),#34d399)"></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div class="stat-icon" style="background:rgba(255,107,107,0.12); color:var(--accent2)">⏳</div>
+            <span class="stat-trend trend-down">Due soon</span>
+          </div>
+          <div class="stat-val" style="color:var(--accent2)">3</div>
+          <div class="stat-lbl">Pending Tasks</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" style="width:30%; background:linear-gradient(90deg,var(--accent2),#f97316)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="card-header">
+          <div class="card-title">Attendance Over Weeks</div>
+          <div class="card-pill">This Semester</div>
+        </div>
+        <canvas id="attendanceChart" height="140"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="card-header">
+          <div class="card-title">GPA Progress</div>
+          <div class="card-pill">Per Semester</div>
+        </div>
+        <canvas id="gpaChart" height="140"></canvas>
+      </div>
+    </div>
+
+    <!-- Lower Row -->
+    <div class="lower-row">
+      <!-- Announcements -->
+      <div class="announce-card">
+        <div class="card-header">
+          <div class="card-title">Announcements & Notifications</div>
+          <div class="card-pill">3 New</div>
+        </div>
+        <div class="announce-list">
+          <div class="announce-item">
+            <div class="announce-icon" style="background:rgba(255,107,107,0.12); color:var(--accent2)">📝</div>
+            <div class="announce-body">
+              <h4>Assignment Deadline — DSA Project</h4>
+              <p>Data Structures & Algorithms project submission is due. Ensure all test cases pass before uploading.</p>
+              <time>⏰ Due: March 13, 2026 · 11:59 PM</time>
+            </div>
+          </div>
+          <div class="announce-item">
+            <div class="announce-icon" style="background:rgba(247,201,72,0.12); color:var(--accent4)">📅</div>
+            <div class="announce-body">
+              <h4>Mid-Semester Examination Schedule</h4>
+              <p>Mid-semester exams begin March 18. Timetable posted on the college portal. Check your hall ticket.</p>
+              <time>📌 Posted: March 10, 2026</time>
+            </div>
+          </div>
+          <div class="announce-item">
+            <div class="announce-icon" style="background:rgba(108,99,255,0.12); color:var(--accent)">🏛️</div>
+            <div class="announce-body">
+              <h4>Campus Hackathon 2026 — Registrations Open</h4>
+              <p>Annual 24-hour hackathon registrations are open. Form teams of 2–4. Prizes worth ₹1,00,000.</p>
+              <time>📌 Deadline: March 15, 2026</time>
+            </div>
+          </div>
+          <div class="announce-item">
+            <div class="announce-icon" style="background:rgba(67,233,123,0.12); color:var(--accent3)">🎯</div>
+            <div class="announce-body">
+              <h4>Library Extended Hours</h4>
+              <p>Library will remain open 24/7 during exam week (March 17–24) for student convenience.</p>
+              <time>📌 Posted: March 9, 2026</time>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Task Manager -->
+      <div class="task-card">
+        <div class="card-header">
+          <div class="card-title">📋 Task Manager</div>
+          <div class="card-pill" id="task-count">3 pending</div>
+        </div>
+        <div class="task-add-row">
+          <input class="task-input" id="task-input" placeholder="Add a new task…" onkeydown="if(event.key==='Enter')addTask()">
+          <button class="add-btn" onclick="addTask()">+</button>
+        </div>
+        <div class="task-list" id="task-list"></div>
+        <div class="task-footer">
+          <span id="task-stats">0 of 0 completed</span>
+          <button class="task-clear" onclick="clearDone()">Clear done</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+// ── THEME ──
+let isDark = true;
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-label').textContent = isDark ? 'Light Mode' : 'Dark Mode';
+  updateCharts();
+}
+
+// ── SIDEBAR ──
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+function setActive(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  closeSidebar();
+}
+
+// ── DATE ──
+(function() {
+  const d = new Date();
+  document.getElementById('cur-date').textContent = d.toLocaleDateString('en-IN',{weekday:'long',month:'long',day:'numeric'});
+})();
+
+// ── CHARTS ──
+let attendanceChart, gpaChart;
+
+function getChartColors() {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  return {
+    grid: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+    tick: dark ? '#5a6078' : '#8890a8',
+    bg: dark ? '#1e2230' : '#ffffff',
+  };
+}
+
+function createCharts() {
+  const c = getChartColors();
+  const commonOpts = (label) => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ` ${ctx.parsed.y}${label}` } } },
+    scales: {
+      x: { grid: { color: c.grid }, ticks: { color: c.tick, font: { family: 'DM Sans', size: 11 } }, border: { display: false } },
+      y: { grid: { color: c.grid }, ticks: { color: c.tick, font: { family: 'DM Sans', size: 11 } }, border: { display: false } }
+    }
+  });
+
+  // Attendance
+  const actx = document.getElementById('attendanceChart').getContext('2d');
+  const aGrad = actx.createLinearGradient(0,0,0,150);
+  aGrad.addColorStop(0,'rgba(108,99,255,0.35)');
+  aGrad.addColorStop(1,'rgba(108,99,255,0)');
+  attendanceChart = new Chart(actx, {
+    type: 'line',
+    data: {
+      labels: ['Wk1','Wk2','Wk3','Wk4','Wk5','Wk6','Wk7','Wk8'],
+      datasets: [{
+        data: [72,78,75,83,80,88,85,85],
+        borderColor: '#6c63ff',
+        backgroundColor: aGrad,
+        tension: 0.45,
+        fill: true,
+        pointBackgroundColor: '#6c63ff',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        borderWidth: 2.5,
+      }]
+    },
+    options: { ...commonOpts('%'), plugins: { ...commonOpts('%').plugins } }
+  });
+
+  // GPA
+  const gctx = document.getElementById('gpaChart').getContext('2d');
+  const gGrad = gctx.createLinearGradient(0,0,0,150);
+  gGrad.addColorStop(0,'rgba(247,201,72,0.3)');
+  gGrad.addColorStop(1,'rgba(247,201,72,0)');
+  gpaChart = new Chart(gctx, {
+    type: 'bar',
+    data: {
+      labels: ['Sem 1','Sem 2','Sem 3','Sem 4'],
+      datasets: [{
+        data: [7.8, 8.0, 8.1, 8.4],
+        backgroundColor: ['rgba(108,99,255,0.7)','rgba(108,99,255,0.75)','rgba(108,99,255,0.8)','rgba(247,201,72,0.85)'],
+        borderRadius: 8,
+        borderSkipped: false,
+      }]
+    },
+    options: { ...commonOpts('/10'), plugins: { ...commonOpts('/10').plugins } }
+  });
+}
+
+function updateCharts() {
+  const c = getChartColors();
+  [attendanceChart, gpaChart].forEach(ch => {
+    if (!ch) return;
+    ch.options.scales.x.grid.color = c.grid;
+    ch.options.scales.y.grid.color = c.grid;
+    ch.options.scales.x.ticks.color = c.tick;
+    ch.options.scales.y.ticks.color = c.tick;
+    ch.update();
+  });
+}
+
+// ── TASK MANAGER ──
+let tasks = [
+  { id: 1, text: 'Submit DSA Project', tag: 'urgent', done: false },
+  { id: 2, text: 'Study OS Chapter 5', tag: 'soon', done: false },
+  { id: 3, text: 'Read DBMS notes', tag: 'soon', done: false },
+  { id: 4, text: 'Register for Hackathon', tag: 'soon', done: false },
+  { id: 5, text: 'Attend mock interview', tag: 'urgent', done: false },
+];
+let nextId = 6;
+
+function renderTasks() {
+  const list = document.getElementById('task-list');
+  list.innerHTML = '';
+  const pending = tasks.filter(t => !t.done);
+  const done = tasks.filter(t => t.done);
+  const all = [...pending, ...done];
+  all.forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'task-item' + (t.done ? ' done' : '');
+    div.innerHTML = `
+      <div class="task-check" onclick="toggleTask(${t.id})">${t.done ? '✓' : ''}</div>
+      <span class="task-text">${t.text}</span>
+      ${t.tag ? `<span class="task-tag tag-${t.done ? 'done' : t.tag}">${t.done ? 'done' : t.tag}</span>` : ''}
+      <button class="task-del" onclick="deleteTask(${t.id})">✕</button>
+    `;
+    list.appendChild(div);
+  });
+  const doneCount = tasks.filter(t => t.done).length;
+  const pendingCount = tasks.filter(t => !t.done).length;
+  document.getElementById('task-count').textContent = `${pendingCount} pending`;
+  document.getElementById('task-stats').textContent = `${doneCount} of ${tasks.length} completed`;
+}
+
+function addTask() {
+  const inp = document.getElementById('task-input');
+  const text = inp.value.trim();
+  if (!text) return;
+  tasks.unshift({ id: nextId++, text, tag: 'soon', done: false });
+  inp.value = '';
+  renderTasks();
+}
+
+function toggleTask(id) {
+  const t = tasks.find(t => t.id === id);
+  if (t) t.done = !t.done;
+  renderTasks();
+}
+
+function deleteTask(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  renderTasks();
+}
+
+function clearDone() {
+  tasks = tasks.filter(t => !t.done);
+  renderTasks();
+}
+
+// Init
+window.addEventListener('DOMContentLoaded', () => {
+  createCharts();
+  renderTasks();
+});
+</script>
+</body>
+</html>
